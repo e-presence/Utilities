@@ -6,21 +6,22 @@
 
 namespace EPresence\Utilities;
 
-use \Exception;
+use EPresence\Utilities\Exceptions\NotCliModeException;
+use EPresence\Utilities\Exceptions\NotLinuxException;
 
 class ProcessLock {
 
 	private $name;
 	private $path;
-	private $fullName;
 	private $extension;
+	private $fullName;
 	
 	public function __construct() {
 		if (strtolower(PHP_SAPI) != 'cli') {
-			throw new Exception('Only for CLI!');
+			throw new NotCliModeException();
 		}
 		if (strtolower(PHP_OS) != 'linux') {
-			throw new Exception('Only for Linux!');
+			throw new NotLinuxException();
 		}
 		global $argv;
 		$this->path = '/tmp/';
