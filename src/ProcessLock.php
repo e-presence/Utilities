@@ -16,6 +16,10 @@ class ProcessLock {
 	private $extension;
 	private $fullName;
 	
+	/**
+	 * @throws EPresence\Utilities\Exceptions\NotCliModeException
+	 * @throws EPresence\Utilities\Exceptions\NotLinuxException
+	 */
 	public function __construct() {
 		if (strtolower(PHP_SAPI) != 'cli') {
 			throw new NotCliModeException();
@@ -30,6 +34,9 @@ class ProcessLock {
 		$this->fullName = $this->path . $this->name . $this->extension;
 	}
 
+	/**
+	 * @return boolean
+	 */
 	public function isRunning() {
 		$is_running = false;
 		if (file_exists($this->fullName)) {
@@ -42,6 +49,9 @@ class ProcessLock {
 		return $is_running;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function lock() {
 		$result = false;
 		if (!$this->isRunning()) {
@@ -51,6 +61,9 @@ class ProcessLock {
 		return $result;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function unlock() {
 		$unlocked = false;
 		if ($this->isRunning()) {

@@ -6,9 +6,10 @@
 
 namespace EPresence\Utilities;
 
+use EPresence\Utilities\Exceptions\NotCliModeException;
+
 class Console {
 
-	const DEFAULT_INPUT_BYTES = 128;
 	const RED = "\033[31m";
 	const YELLOW = "\033[1;33m";
 	const GREEN = "\033[32m";
@@ -18,44 +19,99 @@ class Console {
 	
 	private $ioBuffer;
 	
-	public function read($bytes = self::DEFAULT_INPUT_BYTES) {
-		$handler = fopen('php://stdin', 'r');
-		$bytes = $this->validateInputBytesCount($bytes);
-		$this->ioBuffer = rtrim(fgets($handler, $bytes));
-		fclose($handler);
+	/**
+	 * @throws EPresence\Utilities\Exceptions\NotCliModeException
+	 */
+	public function __construct() {
+		if (strtolower(PHP_SAPI) != 'cli') {
+			throw new NotCliModeException();
+		}
+	}
+	
+	/**
+	 * @param string $message
+	 * @param boolean $decorated
+	 * @param boolean $line_break
+	 * @return string
+	 */
+	public function read($message = '', $decorated = true, $line_break = false) {
+		$message = trim($message);
+		$decorated = (boolean)$decorated;
+		$line_break = (boolean)$line_break;
+		
+		if ($decorated) {
+			$message = $this->createDecoratedReadMessage($message);
+		}
+		if ($line_break) {
+			$this->writeLn($message);
+		} else {
+			$this->write($message);
+		}
+		$this->ioBuffer = trim(fgets(STDIN));
 		return $this->ioBuffer;
 	}
 	
-	public function error($message) {
-		$this->write(static::RED . 'ERROR: ' . $message . $this->getResetCode());
+	/**
+	 * @param string $message
+	 * @param boolean $decorated
+	 * @return string
+	 */
+	public function readLn($message = '', $decorated = true) {
+		return $this->read($message, $decorated, true);
 	}
 	
-	public function warning($message) {
-		$this->write(static::YELLOW . 'WARNING: ' . $message . $this->getResetCode());
+	/**
+	 * @param string $message
+	 */
+	public function error($message = '') {
+		$this->writeLn(static::RED . 'ERROR: ' . $message . static::COLOR_RESET);
 	}
 	
-	public function info($message) {
-		$this->write(static::GREEN . 'INFO: ' . $message . $this->getResetCode());
+	/**
+	 * @param string $message
+	 */
+	public function warning($message = '') {
+		$this->writeLn(static::YELLOW . 'WARNING: ' . $message . static::COLOR_RESET);
 	}
 	
-	public function debug($message) {
-		$this->write(static::BLUE . 'DEBUG: ' . $message . $this->getResetCode());
+	/**
+	 * @param string $message
+	 */
+	public function info($message = '') {
+		$this->writeLn(static::GREEN . 'INFO: ' . $message . static::COLOR_RESET);
 	}
 	
-	public function write($message) {
-		echo $message;
+	/**
+	 * @param string $message
+	 */
+	public function debug($message = '') {
+		$this->writeLn(static::BLUE . 'DEBUG: ' . $message . static::COLOR_RESET);
 	}
 	
-	private function getResetCode() {
-		return static::COLOR_RESET . PHP_EOL;
+	/**
+	 * @param string $message
+	 */
+	public function write($message = '') {
+		fwrite(STDOUT, $message);
 	}
 	
-	private function validateInputBytesCount($bytes = self::DEFAULT_INPUT_BYTES) {
-		$bytes = (integer)$bytes;
-		if ($bytes <= 0) {
-			$bytes = self::DEFAULT_INPUT_BYTES;
+	/**
+	 * @param string $message
+	 */
+	public function writeLn($message = '') {
+		$this->write($message . PHP_EOL);
+	}
+	
+	/**
+	 * @param string $message
+	 * @return string
+	 */
+	private function createDecoratedReadMessage($message = '') {
+		$message = trim($message);
+		if ($message > '') {
+			$message .= ': ';
 		}
-		return $bytes;
-	}
+		return $message;
+	} 
 	
 }

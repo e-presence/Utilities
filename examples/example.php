@@ -21,7 +21,6 @@ if ($process->isRunning()) {
 }
 
 $process->lock();
-$console->info('Try to run this progrma in other terminal, then press [Enter] here:');
-$console->read();
+$console->readLn('Try to run this script in other terminal, then press [Enter] here');
 $process->unlock();
 exit(0);
