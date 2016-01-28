@@ -3,19 +3,17 @@
  * @author Viktor Bliszkó <viktor.bliszko@e-presence.hu>
  * @copyright Copyright (c) 2015-2016, e-presence, http://e-presence.hu
  */
-
 namespace EPresence\Utilities;
 
 use EPresence\Utilities\Exceptions\NotCliModeException;
 use EPresence\Utilities\Exceptions\NotLinuxException;
 
 class ProcessLock {
-
 	private $name;
 	private $path;
 	private $extension;
 	private $fullName;
-	
+
 	/**
 	 * @throws EPresence\Utilities\Exceptions\NotCliModeException
 	 * @throws EPresence\Utilities\Exceptions\NotLinuxException
@@ -35,7 +33,7 @@ class ProcessLock {
 	}
 
 	/**
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isRunning() {
 		$is_running = false;
@@ -46,23 +44,25 @@ class ProcessLock {
 				$is_running = true;
 			}
 		}
+
 		return $is_running;
 	}
-	
+
 	/**
-	 * @return boolean
+	 * @return bool
 	 */
 	public function lock() {
 		$result = false;
 		if (!$this->isRunning()) {
 			$result = file_put_contents($this->fullName, getmypid() . "\n");
-			$result = (boolean)$result;
+			$result = (bool) $result;
 		}
+
 		return $result;
 	}
-	
+
 	/**
-	 * @return boolean
+	 * @return bool
 	 */
 	public function unlock() {
 		$unlocked = false;
@@ -70,6 +70,7 @@ class ProcessLock {
 			@unlink($this->fullName);
 			$unlocked = true;
 		}
+
 		return $unlocked;
 	}
 
