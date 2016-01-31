@@ -6,7 +6,7 @@
 namespace EPresence\Utilities;
 
 use EPresence\Utilities\Exceptions\NotCliModeException;
-use EPresence\Utilities\Exceptions\NotLinuxException;
+use EPresence\Utilities\Exceptions\WindowsException;
 
 class ProcessLock {
 	private $name;
@@ -16,20 +16,20 @@ class ProcessLock {
 
 	/**
 	 * @throws EPresence\Utilities\Exceptions\NotCliModeException
-	 * @throws EPresence\Utilities\Exceptions\NotLinuxException
+	 * @throws EPresence\Utilities\Exceptions\WindowsException
 	 */
 	public function __construct() {
 		if (strtolower(PHP_SAPI) != 'cli') {
 			throw new NotCliModeException();
 		}
-		if (strtolower(PHP_OS) != 'linux') {
-			throw new NotLinuxException();
+		if (OperatingSystem::getInstance()->isWindows()) {
+			throw new WindowsException();
 		}
 		global $argv;
-		$this->path = '/tmp/';
+		$this->path = sys_get_temp_dir();
 		$this->extension = '.lock';
 		$this->name = basename($argv[0]);
-		$this->fullName = $this->path . $this->name . $this->extension;
+		$this->fullName = $this->path . DIRECTORY_SEPARATOR . $this->name . $this->extension;
 	}
 
 	/**

@@ -1,5 +1,8 @@
-/vendor/
+*komodo*
+/vendor
+run_tests.sh
+client.php
 composer.lock
-*.komodoproject
 code-standard.txt
 cs-fix-diff-only.sh
+coverage.txt

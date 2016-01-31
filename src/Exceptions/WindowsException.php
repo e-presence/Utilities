@@ -7,10 +7,10 @@ namespace EPresence\Utilities\Exceptions;
 
 use \Exception;
 
-class NotLinuxException extends Exception {
+class WindowsException extends Exception {
 	public function __construct() {
 		parent::__construct();
-		$this->message = 'Only for Linux!';
+		$this->message = 'Not compatible with MS Windows systems.';
 	}
 
 }
